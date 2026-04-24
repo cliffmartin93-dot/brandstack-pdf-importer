@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: brandstack-pdf-importer
+    env: node
+    buildCommand: |
+      npm install
+      apt-get update
+      apt-get install -y graphicsmagick ghostscript
+    startCommand: node server.js
