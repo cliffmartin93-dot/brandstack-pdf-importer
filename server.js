@@ -83,6 +83,7 @@ console.log("FIXED PDF URL:", pdfUrl);
 
         page++;
       } catch (err) {
+  console.log("PDF CONVERSION ERROR:", err);
         break;
       }
     }
