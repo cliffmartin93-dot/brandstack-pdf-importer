@@ -16,6 +16,6 @@
     "express": "^5.2.1",
     "fs-extra": "^11.3.4",
     "multer": "^2.1.1",
-    "pdf-poppler": "^0.2.3"
+    "pdf2pic": "^3.2.0"
   }
 }
