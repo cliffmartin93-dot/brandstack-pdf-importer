@@ -12,7 +12,9 @@ app.use(express.json());
 const upload = multer({
   dest: "uploads/"
 });
-
+app.get("/", (req, res) => {
+  res.send("BrandStack PDF Importer is running 🚀");
+});
 app.post("/convert-pdf", upload.single("pdf"), async (req, res) => {
   try {
     if (!req.file) {
