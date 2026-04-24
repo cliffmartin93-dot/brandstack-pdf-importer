@@ -89,10 +89,12 @@ console.log("FIXED PDF URL:", pdfUrl);
 
     await fs.remove(pdfPath);
 
-    res.json({
-      success: true,
-      pages: results
-    });
+    console.log("CONVERTED PAGES:", results);
+
+res.json({
+  success: true,
+  pages: results
+});
 
   } catch (error) {
     console.error(error);
