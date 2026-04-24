@@ -16,13 +16,18 @@ app.get("/", (req, res) => {
 
 app.post("/convert-pdf", async (req, res) => {
   try {
-    const { pdfUrl } = req.body;
+   let { pdfUrl } = req.body;
 
-    if (!pdfUrl) {
-      return res.status(400).json({
-        error: "No PDF URL provided"
-      });
-    }
+if (!pdfUrl) {
+  return res.status(400).json({
+    error: "No PDF URL provided"
+  });
+}
+
+// Fix Bubble URL format
+if (!pdfUrl.startsWith("http")) {
+  pdfUrl = "https:" + pdfUrl;
+}
 
     const uploadsFolder = path.join(__dirname, "uploads");
     const outputFolder = path.join(__dirname, "output");
