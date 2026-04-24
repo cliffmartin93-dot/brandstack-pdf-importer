@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { fromPath } = require("pdf2pic");
+const pdf = require("pdf-poppler");
 const fs = require("fs-extra");
 const path = require("path");
 const axios = require("axios");
@@ -16,25 +16,25 @@ app.get("/", (req, res) => {
 
 app.post("/convert-pdf", async (req, res) => {
   try {
-   let { pdfUrl } = req.body;
+    let { pdfUrl } = req.body;
 
-console.log("RAW PDF URL:", pdfUrl);
+    console.log("RAW PDF URL:", pdfUrl);
 
-if (!pdfUrl) {
-  return res.status(400).json({
-    error: "No PDF URL provided"
-  });
-}
+    if (!pdfUrl) {
+      return res.status(400).json({
+        error: "No PDF URL provided"
+      });
+    }
 
-if (pdfUrl.startsWith("//")) {
-  pdfUrl = "https:" + pdfUrl;
-}
+    if (pdfUrl.startsWith("//")) {
+      pdfUrl = "https:" + pdfUrl;
+    }
 
-if (!pdfUrl.startsWith("http")) {
-  pdfUrl = "https://" + pdfUrl;
-}
+    if (!pdfUrl.startsWith("http")) {
+      pdfUrl = "https://" + pdfUrl;
+    }
 
-console.log("FIXED PDF URL:", pdfUrl);
+    console.log("FIXED PDF URL:", pdfUrl);
 
     const uploadsFolder = path.join(__dirname, "uploads");
     const outputFolder = path.join(__dirname, "output");
@@ -60,41 +60,33 @@ console.log("FIXED PDF URL:", pdfUrl);
       writer.on("error", reject);
     });
 
-    const convert = fromPath(pdfPath, {
-      density: 150,
-      saveFilename: "page",
-      savePath: outputFolder,
+    // Convert PDF to PNG pages using pdf-poppler
+    let opts = {
       format: "png",
-      width: 1200,
-      height: 1600
-    });
+      out_dir: outputFolder,
+      out_prefix: "page",
+      page: null
+    };
 
-    let results = [];
-    let page = 1;
+    await pdf.convert(pdfPath, opts);
 
-    while (true) {
-      try {
-        const result = await convert(page);
+    const files = await fs.readdir(outputFolder);
 
-        results.push({
-          page,
-          image: result.path
-        });
-
-        page++;
-      } catch (err) {
-        break;
-      }
-    }
+    let results = files
+      .filter(file => file.endsWith(".png"))
+      .map((file, index) => ({
+        page: index + 1,
+        image: path.join(outputFolder, file)
+      }));
 
     await fs.remove(pdfPath);
 
     console.log("CONVERTED PAGES:", results);
 
-res.json({
-  success: true,
-  pages: results
-});
+    res.json({
+      success: true,
+      pages: results
+    });
 
   } catch (error) {
     console.error(error);
