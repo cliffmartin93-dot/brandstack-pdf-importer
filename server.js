@@ -10,6 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use("/output", express.static(path.join(__dirname, "output")));
+
 app.get("/", (req, res) => {
   res.send("BrandStack PDF Importer is running 🚀");
 });
@@ -77,9 +79,9 @@ console.log("FIXED PDF URL:", pdfUrl);
         const result = await convert(page);
 
         results.push({
-          page,
-          image: result.path
-        });
+  page,
+  image: `${req.protocol}://${req.get("host")}/output/page.${page}.png`
+});
 
         page++;
       } catch (err) {
