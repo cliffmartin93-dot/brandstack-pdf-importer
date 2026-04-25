@@ -2,6 +2,7 @@ services:
   - type: web
     name: brandstack-pdf-importer
     env: node
+    plan: free
     buildCommand: |
       npm install
       apt-get update
